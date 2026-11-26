@@ -1,0 +1,146 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 560" role="img" aria-labelledby="titulo descricao">
+  <title id="titulo">Boletim de torneio sobre a mesa do clube de xadrez</title>
+  <desc id="descricao">Ilustração editorial original: folha impressa de classificação com colunas de rodadas e pontuação sobre uma mesa com casas de tabuleiro, torre azul e peões em ardósia.</desc>
+
+  <!-- Superfície da mesa do clube -->
+  <rect width="800" height="560" fill="#E7E8E3"/>
+
+  <!-- Borda sutil de tabuleiro no canto superior esquerdo -->
+  <g opacity=".09" fill="#3C413C">
+    <rect x="24" y="24" width="44" height="44"/>
+    <rect x="112" y="24" width="44" height="44"/>
+    <rect x="68" y="68" width="44" height="44"/>
+    <rect x="24" y="112" width="44" height="44"/>
+    <rect x="68" y="156" width="44" height="44"/>
+  </g>
+
+  <!-- Linha de horizonte da mesa -->
+  <path d="M0 478H800" stroke="#3C413C" stroke-opacity=".2" stroke-width="2"/>
+  <path d="M0 484H800" stroke="#3C413C" stroke-opacity=".08" stroke-width="1"/>
+
+  <!-- Folha secundária empilhada (súmula de fundo) -->
+  <g transform="rotate(2.2 400 280)">
+    <rect x="148" y="54" width="496" height="422" rx="3" fill="#F6F5F0" fill-opacity=".65" stroke="#3C413C" stroke-opacity=".28" stroke-width="1.5"/>
+  </g>
+
+  <!-- Folha principal do Boletim -->
+  <g transform="rotate(-1.8 368 278)">
+    <!-- Sombra seca de papel sobre mesa -->
+    <rect x="128" y="68" width="504" height="428" rx="3" fill="#242822" opacity=".1"/>
+    <rect x="118" y="58" width="504" height="428" rx="3" fill="#F6F5F0" stroke="#3C413C" stroke-width="2.5"/>
+
+    <!-- Filete superior discreto em azul de ação -->
+    <rect x="119.25" y="59.25" width="501.5" height="6" fill="#1F4E79"/>
+
+    <!-- Masthead da folha impressa -->
+    <text x="150" y="118" font-family="Georgia, 'Times New Roman', serif" font-size="40" font-weight="700" fill="#242822">Boletim</text>
+    <text x="152" y="142" font-family="'IBM Plex Mono', monospace" font-size="12" font-weight="500" letter-spacing="0.8" fill="#1F4E79">TORNEIO DE OUTONO — RODADA 3</text>
+
+    <!-- Selo da rodada no canto direito do cabeçalho -->
+    <rect x="498" y="88" width="90" height="48" rx="2" fill="#E7E8E3" stroke="#3C413C" stroke-opacity=".35" stroke-width="1.25"/>
+    <text x="543" y="108" font-family="'IBM Plex Mono', monospace" font-size="10" font-weight="600" fill="#3C413C" text-anchor="middle">SUÍÇO</text>
+    <text x="543" y="126" font-family="'IBM Plex Mono', monospace" font-size="14" font-weight="600" fill="#1F4E79" text-anchor="middle">R3 / 5</text>
+
+    <!-- Dupla régua editorial -->
+    <path d="M150 158H588" stroke="#3C413C" stroke-width="2.25"/>
+    <path d="M150 164H588" stroke="#3C413C" stroke-opacity=".45" stroke-width="1"/>
+
+    <!-- Cabeçalho da tabela de classificação -->
+    <rect x="150" y="176" width="438" height="30" fill="#E7E8E3" fill-opacity=".8"/>
+    <path d="M150 176H588M150 206H588M150 244H588M150 282H588M150 320H588M150 358H588M150 396H588" stroke="#3C413C" stroke-opacity=".24" stroke-width="1.25"/>
+    <path d="M188 176V396M376 176V396M420 176V396M464 176V396M508 176V396" stroke="#3C413C" stroke-opacity=".18" stroke-width="1.25"/>
+
+    <g font-family="'Noto Sans', Arial, sans-serif" font-size="11" font-weight="700" fill="#242822">
+      <text x="169" y="195" text-anchor="middle">#</text>
+      <text x="198" y="195">Jogador</text>
+      <text x="398" y="195" text-anchor="middle">R1</text>
+      <text x="442" y="195" text-anchor="middle">R2</text>
+      <text x="486" y="195" text-anchor="middle">R3</text>
+      <text x="548" y="195" text-anchor="middle">Pontos</text>
+    </g>
+
+    <!-- Destaque sutil na linha do líder -->
+    <rect x="150" y="207" width="438" height="36" fill="#1F4E79" fill-opacity=".06"/>
+
+    <!-- Posições -->
+    <g font-family="'IBM Plex Mono', monospace" font-size="13" font-weight="600" fill="#3C413C" text-anchor="middle">
+      <text x="169" y="230" fill="#1F4E79">1</text>
+      <text x="169" y="268">2</text>
+      <text x="169" y="306">3</text>
+      <text x="169" y="344">4</text>
+      <text x="169" y="382">5</text>
+    </g>
+
+    <!-- Nomes -->
+    <g font-family="'Noto Sans', Arial, sans-serif" font-size="14" fill="#242822">
+      <text x="198" y="230" font-weight="600">H. Nogueira</text>
+      <text x="198" y="268">M. Vasconcelos</text>
+      <text x="198" y="306">C. Peixoto</text>
+      <text x="198" y="344">R. Tavares</text>
+      <text x="198" y="382">L. Santana</text>
+    </g>
+
+    <!-- Resultados por rodada -->
+    <g font-family="'IBM Plex Mono', monospace" font-size="13" fill="#3C413C" text-anchor="middle">
+      <text x="398" y="230">1</text><text x="442" y="230">1</text><text x="486" y="230">1</text>
+      <text x="398" y="268">1</text><text x="442" y="268">½</text><text x="486" y="268">1</text>
+      <text x="398" y="306">1</text><text x="442" y="306">0</text><text x="486" y="306">1</text>
+      <text x="398" y="344">½</text><text x="442" y="344">½</text><text x="486" y="344">½</text>
+      <text x="398" y="382">0</text><text x="442" y="382">1</text><text x="486" y="382">0</text>
+    </g>
+
+    <!-- Pontuação total em azul de ação -->
+    <g font-family="'IBM Plex Mono', monospace" font-size="14" font-weight="700" fill="#1F4E79" text-anchor="middle">
+      <text x="548" y="230">3,0</text>
+      <text x="548" y="268">2,5</text>
+      <text x="548" y="306">2,0</text>
+      <text x="548" y="344">1,5</text>
+      <text x="548" y="382">1,0</text>
+    </g>
+
+    <!-- Rodapé da folha com assinatura de conferência -->
+    <rect x="150" y="416" width="438" height="36" rx="2" fill="#E7E8E3" fill-opacity=".65" stroke="#3C413C" stroke-opacity=".18" stroke-width="1"/>
+    <circle cx="170" cy="434" r="5" fill="#1F4E79"/>
+    <text x="184" y="438" font-family="'Noto Sans', Arial, sans-serif" font-size="12" font-weight="500" fill="#242822">Resultados conferidos na mesa de arbitragem</text>
+    <text x="574" y="438" font-family="'IBM Plex Mono', monospace" font-size="11" fill="#3C413C" text-anchor="end">SÚMULA OK</text>
+  </g>
+
+  <!-- Torre arquitetônica à direita (#1F4E79) -->
+  <g transform="translate(626 276)">
+    <!-- Sombra na mesa -->
+    <ellipse cx="62" cy="212" rx="54" ry="9" fill="#242822" opacity=".14"/>
+    <!-- Ameias -->
+    <path d="M18 14h16v14h14V14h18v14h14V14h16v32H18z" fill="#1F4E79"/>
+    <!-- Colarinho -->
+    <rect x="24" y="49" width="76" height="9" rx="2" fill="#242822" opacity=".18"/>
+    <rect x="22" y="46" width="80" height="9" rx="2" fill="#1F4E79"/>
+    <!-- Corpo afilado -->
+    <path d="M30 57h64l12 118H18z" fill="#1F4E79"/>
+    <!-- Friso luminoso sutil no fuste -->
+    <path d="M40 64h7l-7 104h-7z" fill="#F6F5F0" opacity=".14"/>
+    <!-- Moldura inferior -->
+    <rect x="12" y="175" width="100" height="12" rx="2" fill="#1F4E79"/>
+    <rect x="4" y="189" width="116" height="16" rx="2.5" fill="#242822"/>
+    <rect x="4" y="187" width="116" height="14" rx="2.5" fill="#1F4E79"/>
+  </g>
+
+  <!-- Peão maior à esquerda (#3C413C) -->
+  <g transform="translate(32 360)">
+    <ellipse cx="42" cy="128" rx="38" ry="7" fill="#242822" opacity=".14"/>
+    <circle cx="42" cy="24" r="19" fill="#3C413C"/>
+    <circle cx="36" cy="18" r="5" fill="#F6F5F0" opacity=".14"/>
+    <rect x="25" y="45" width="34" height="7" rx="3.5" fill="#3C413C"/>
+    <path d="M42 52c-15 0-27 24-30 56h60c-3-32-15-56-30-56z" fill="#3C413C"/>
+    <rect x="6" y="108" width="72" height="14" rx="2.5" fill="#242822"/>
+    <rect x="6" y="106" width="72" height="12" rx="2.5" fill="#3C413C"/>
+  </g>
+
+  <!-- Peão menor em primeiro plano (#3C413C) -->
+  <g transform="translate(108 424)">
+    <ellipse cx="28" cy="84" rx="26" ry="5" fill="#242822" opacity=".14"/>
+    <circle cx="28" cy="15" r="12.5" fill="#242822"/>
+    <rect x="17" y="29" width="22" height="5" rx="2.5" fill="#242822"/>
+    <path d="M28 34c-10 0-18 16-20 37h40c-2-21-10-37-20-37z" fill="#3C413C"/>
+    <rect x="4" y="70" width="48" height="10" rx="2" fill="#242822"/>
+  </g>
+</svg>
