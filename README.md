@@ -88,7 +88,7 @@ NEXTAUTH_URL="http://localhost:3000"
 | --- | --- | --- |
 | `MONGODB_URI` | Servidor | URI do cluster Atlas. Libere o IP da sua máquina em **Network Access** e crie o usuário em **Database Access**. |
 | `NEXTAUTH_SECRET` | Servidor | Gere com `openssl rand -base64 32` (Git Bash/WSL) ou `[Convert]::ToBase64String((1..32 | ForEach-Object { Get-Random -Max 256 }))` no PowerShell. Nunca reutilize uma chave de teste. |
-| `NEXTAUTH_URL` | Desenvolvimento e produção | No local use `http://localhost:3000`; na Vercel use a URL final do domínio (neste projeto, `https://boletim-xadrez.vercel.app`). |
+| `NEXTAUTH_URL` | Desenvolvimento e produção | No local use `http://localhost:3000`; na Vercel use a URL final do domínio (neste projeto, `https://boletim-xadrez.m4gns.dev`). |
 
 Para trocar de banco, altere apenas `MONGODB_URI`. As coleções são criadas pelo Mongoose na primeira escrita.
 
@@ -308,7 +308,7 @@ Para repetir, preencha `.env.local`, rode `npm run typecheck` e `npm run build`,
 
 ## Deploy na Vercel
 
-Deploy de produção: **https://boletim-xadrez.vercel.app** — repositório: <https://github.com/M4ggno/boletim-xadrez> (privado).
+Deploy de produção: **https://boletim-xadrez.m4gns.dev** — repositório: <https://github.com/M4ggno/boletim-xadrez> (privado).
 
 1. Crie o cluster no **MongoDB Atlas**, libere o IP `0.0.0.0/0` em **Network Access** (ou use o range da Vercel) e crie um usuário com permissão de leitura/escrita no banco `boletim`.
 2. Envie o projeto para GitHub/GitLab/Bitbucket. Confirme que `.env.local` **não** está no repositório.
@@ -316,7 +316,7 @@ Deploy de produção: **https://boletim-xadrez.vercel.app** — repositório: <h
 4. Em **Environment Variables**, adicione:
    - `MONGODB_URI` com a URI `mongodb+srv://...`.
    - `NEXTAUTH_SECRET` com um valor novo gerado por `openssl rand -base64 32`.
-   - `NEXTAUTH_URL` com a URL final do domínio (neste projeto, `https://boletim-xadrez.vercel.app`).
+   - `NEXTAUTH_URL` com a URL final do domínio (neste projeto, `https://boletim-xadrez.m4gns.dev`).
 5. Deploy. A build roda `next build` automaticamente.
 6. Acesse a URL gerada, crie a conta do organizador e cadastre o primeiro torneio.
 7. Para domínio próprio, configure em **Settings → Domains** e ajuste `NEXTAUTH_URL` apenas se o login apresentar redirect incorreto.
