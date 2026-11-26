@@ -88,7 +88,7 @@ NEXTAUTH_URL="http://localhost:3000"
 | --- | --- | --- |
 | `MONGODB_URI` | Servidor | URI do cluster Atlas. Libere o IP da sua máquina em **Network Access** e crie o usuário em **Database Access**. |
 | `NEXTAUTH_SECRET` | Servidor | Gere com `openssl rand -base64 32` (Git Bash/WSL) ou `[Convert]::ToBase64String((1..32 | ForEach-Object { Get-Random -Max 256 }))` no PowerShell. Nunca reutilize uma chave de teste. |
-| `NEXTAUTH_URL` | Desenvolvimento | Em produção na Vercel, o NextAuth v4 usa `VERCEL_URL` automaticamente; não é preciso definir. |
+| `NEXTAUTH_URL` | Desenvolvimento e produção | No local use `http://localhost:3000`; na Vercel use a URL final do domínio (neste projeto, `https://boletim-xadrez.vercel.app`). |
 
 Para trocar de banco, altere apenas `MONGODB_URI`. As coleções são criadas pelo Mongoose na primeira escrita.
 
@@ -120,7 +120,7 @@ Se você ainda não tem cluster, a camada **M0 (Free)** é permanente e não ped
    - Se a senha tiver caracteres especiais (`@`, `#`, `/`, `:`, etc.), codifique-os na URI (`@` vira `%40`).
 6. Cole a URI em `MONGODB_URI` no `.env.local` e gere o `NEXTAUTH_SECRET`.
 7. Rode `npm run dev`, crie uma conta em `/registrar` e verifique a coleção `users` no Atlas. Se aparecer, a conexão está correta.
-8. Na Vercel, use a **mesma URI** e o mesmo segredo em Environment Variables. Não defina `NEXTAUTH_URL`.
+8. Na Vercel, use a **mesma URI** e o mesmo segredo em Environment Variables. Defina `NEXTAUTH_URL` com a URL final do projeto.
 
 Dica: dá para usar o mesmo cluster Atlas no local e em produção. Assim, o banco de desenvolvimento e o de publicação têm a mesma configuração.
 
@@ -308,13 +308,15 @@ Para repetir, preencha `.env.local`, rode `npm run typecheck` e `npm run build`,
 
 ## Deploy na Vercel
 
+Deploy de produção: **https://boletim-xadrez.vercel.app** — repositório: <https://github.com/M4ggno/boletim-xadrez> (privado).
+
 1. Crie o cluster no **MongoDB Atlas**, libere o IP `0.0.0.0/0` em **Network Access** (ou use o range da Vercel) e crie um usuário com permissão de leitura/escrita no banco `boletim`.
 2. Envie o projeto para GitHub/GitLab/Bitbucket. Confirme que `.env.local` **não** está no repositório.
 3. Na Vercel, clique em **Add New → Project**, importe o repositório. O framework é detectado como Next.js.
 4. Em **Environment Variables**, adicione:
    - `MONGODB_URI` com a URI `mongodb+srv://...`.
    - `NEXTAUTH_SECRET` com um valor novo gerado por `openssl rand -base64 32`.
-   - Não defina `NEXTAUTH_URL`: o NextAuth v4 usa `VERCEL_URL` no ambiente da Vercel. Se precisar fixar, use a URL final do domínio.
+   - `NEXTAUTH_URL` com a URL final do domínio (neste projeto, `https://boletim-xadrez.vercel.app`).
 5. Deploy. A build roda `next build` automaticamente.
 6. Acesse a URL gerada, crie a conta do organizador e cadastre o primeiro torneio.
 7. Para domínio próprio, configure em **Settings → Domains** e ajuste `NEXTAUTH_URL` apenas se o login apresentar redirect incorreto.
