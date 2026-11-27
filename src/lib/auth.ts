@@ -44,13 +44,16 @@ export const authOptions: NextAuthOptions = {
   },
   callbacks: {
     async jwt({ token, user }) {
-      if (user) token.id = user.id;
+      if (user) {
+        token.id = user.id;
+        token.nome = user.nome;
+      }
       return token;
     },
     async session({ session, token }) {
       if (session.user && token.id) {
         session.user.id = token.id;
-        session.user.nome = token.name ?? null;
+        session.user.nome = token.nome ?? null;
       }
       return session;
     },

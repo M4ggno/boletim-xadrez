@@ -13,6 +13,22 @@ export function Carregando({ rotulo = 'Carregando…' }: { rotulo?: string }) {
   );
 }
 
+/** Esqueleto de rota: mostra a forma do conteúdo enquanto o segmento carrega. */
+export function Esqueleto({ linhas = 4 }: { linhas?: number }) {
+  return (
+    <div role="status" aria-label="Carregando conteúdo" className="space-y-3 rounded-md border border-estrutura/18 bg-papel p-6">
+      <div className="h-7 w-1/3 animate-pulse rounded bg-estrutura/20" />
+      <div className="h-4 w-2/3 animate-pulse rounded bg-estrutura/10" />
+      <div className="space-y-2 pt-2">
+        {Array.from({ length: linhas }, (_, indice) => (
+          <div key={indice} className="h-11 animate-pulse rounded bg-estrutura/10" />
+        ))}
+      </div>
+      <span className="sr-only">Carregando…</span>
+    </div>
+  );
+}
+
 export function Vazio({
   titulo,
   descricao,

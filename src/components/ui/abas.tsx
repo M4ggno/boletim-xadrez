@@ -19,7 +19,7 @@ export function AbaGatilho({ className, ...props }: React.ComponentProps<typeof 
   return (
     <TabsPrimitive.Trigger
       className={cn(
-        'inline-flex min-h-11 items-center whitespace-nowrap border-b-2 border-transparent px-4 text-sm font-medium text-estrutura/70 transition-colors hover:text-estrutura data-[state=active]:border-acao data-[state=active]:text-acao',
+        'inline-flex min-h-11 items-center whitespace-nowrap border-b-2 border-transparent px-4 text-sm font-medium text-estrutura/85 transition-colors hover:text-estrutura data-[state=active]:border-acao data-[state=active]:text-acao',
         className,
       )}
       {...props}

@@ -3,7 +3,7 @@ import { Types, type QueryFilter } from 'mongoose';
 import { dbConnect } from '@/lib/db';
 import { exigirSessao, responderErro } from '@/lib/guards';
 import { toTorneioDTO } from '@/lib/serializers';
-import { validarPayload } from '@/lib/validacao';
+import { escaparRegex, validarPayload } from '@/lib/validacao';
 import Torneio, { type ITorneio } from '@/models/Torneio';
 import { torneioSchema } from '@/schemas/torneio';
 import { STATUS_TORNEIO, type StatusTorneio } from '@/types/dominio';
@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
     if (filtros.status && STATUS_TORNEIO.some((opcao) => opcao === filtros.status)) {
       consulta.status = filtros.status as StatusTorneio;
     }
-    if (filtros.q) consulta.nome = { $regex: filtros.q, $options: 'i' };
+    if (filtros.q) consulta.nome = { $regex: escaparRegex(filtros.q), $options: 'i' };
 
     const documentos = await Torneio.find(consulta).sort({ dataInicio: -1 }).lean();
     const resposta: ListaDTO<TorneioDTO> = {

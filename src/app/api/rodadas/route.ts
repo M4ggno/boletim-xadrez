@@ -4,6 +4,8 @@ import { dbConnect } from '@/lib/db';
 import { buscarDoUsuario, exigirSessao, responderErro } from '@/lib/guards';
 import { toRodadaDTO } from '@/lib/serializers';
 import { ErroValidacao, validarPayload } from '@/lib/validacao';
+import Inscricao from '@/models/Inscricao';
+import Jogador from '@/models/Jogador';
 import Rodada, { type IRodada } from '@/models/Rodada';
 import Torneio from '@/models/Torneio';
 import { rodadaSchema } from '@/schemas/rodada';
@@ -40,8 +42,25 @@ export async function POST(request: NextRequest) {
     await dbConnect();
 
     const torneio = await buscarDoUsuario(Torneio, dados.torneioId, usuarioId);
-    if (torneio.status === 'Encerrado') {
-      throw new ErroValidacao('Não é possível criar rodadas em um torneio encerrado.');
+    if (torneio.status !== 'Em andamento') {
+      throw new ErroValidacao('Inicie o torneio antes de gerar rodadas.');
+    }
+    if (dados.numero > torneio.numeroRodadas) {
+      throw new ErroValidacao('Todas as rodadas previstas já foram geradas.');
+    }
+
+    const inscricoes = await Inscricao.find({
+      torneioId: new Types.ObjectId(dados.torneioId),
+      usuarioId: new Types.ObjectId(usuarioId),
+    })
+      .select('jogadorId')
+      .lean();
+    const totalJogadores = await Jogador.countDocuments({
+      _id: { $in: inscricoes.map((item) => item.jogadorId) },
+      usuarioId: new Types.ObjectId(usuarioId),
+    });
+    if (totalJogadores < 2 || totalJogadores % 2 !== 0) {
+      throw new ErroValidacao('A rodada exige um número par de jogadores inscritos.');
     }
 
     const jaExiste = await Rodada.exists({

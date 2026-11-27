@@ -50,3 +50,11 @@ export function TH({ className, ...props }: React.ComponentProps<'th'>) {
 export function TD({ className, ...props }: React.ComponentProps<'td'>) {
   return <td className={cn('px-4 py-3.5 align-middle text-estrutura', className)} {...props} />;
 }
+
+/** Aliases no padrão ShadCN/UI; os nomes em português seguem sendo usados na aplicação. */
+export const Table = Tabela;
+export const TableHeader = THead;
+export const TableBody = TBody;
+export const TableRow = TR;
+export const TableHead = TH;
+export const TableCell = TD;

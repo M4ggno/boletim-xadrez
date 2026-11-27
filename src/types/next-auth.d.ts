@@ -9,6 +9,7 @@ declare module 'next-auth' {
   }
 
   interface User {
+    id: string;
     nome?: string | null;
   }
 }
@@ -16,5 +17,6 @@ declare module 'next-auth' {
 declare module 'next-auth/jwt' {
   interface JWT {
     id?: string;
+    nome?: string | null;
   }
 }

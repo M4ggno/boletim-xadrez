@@ -2,7 +2,7 @@
 
 import { useActionState, useEffect, useRef, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { toast } from 'sonner';
 import { useInvalidarAposAcao } from '@/hooks/useInvalidarAposAcao';
@@ -10,7 +10,7 @@ import { queryKeys } from '@/services/queryKeys';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Campo } from '@/components/formularios/Campo';
-import { Select } from '@/components/ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { criarJogadorAction } from '@/app/actions/jogador-actions';
 import { estadoInicialAcao } from '@/types/acoes';
 import { CATEGORIAS_JOGADOR } from '@/types/dominio';
@@ -28,6 +28,7 @@ export function FormularioJogador({ onSucesso }: { onSucesso?: () => void }) {
   );
   const {
     register,
+    control,
     handleSubmit,
     formState: { errors },
   } = useForm<JogadorForm>({
@@ -66,17 +67,28 @@ export function FormularioJogador({ onSucesso }: { onSucesso?: () => void }) {
         <Input {...register('rating', { valueAsNumber: true })} type="number" min={0} max={3000} required />
       </Campo>
       <Campo rotulo="Categoria" erro={errors.categoria?.message}>
-        <Select {...register('categoria')}>
-          {CATEGORIAS_JOGADOR.map((categoria) => (
-            <option key={categoria} value={categoria}>{categoria}</option>
-          ))}
-        </Select>
+        <Controller
+          control={control}
+          name="categoria"
+          render={({ field }) => (
+            <Select value={field.value} onValueChange={field.onChange} name={field.name}>
+              <SelectTrigger aria-invalid={Boolean(errors.categoria)}>
+                <SelectValue placeholder="Selecione a categoria" />
+              </SelectTrigger>
+              <SelectContent>
+                {CATEGORIAS_JOGADOR.map((categoria) => (
+                  <SelectItem key={categoria} value={categoria}>{categoria}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
+        />
       </Campo>
       <Campo rotulo="Clube (opcional)" erro={errors.clube?.message}>
         <Input {...register('clube')} autoComplete="off" />
       </Campo>
       <label className="flex min-h-11 items-center gap-2 text-sm sm:col-span-2">
-        <input {...register('ativo')} type="checkbox" className="h-5 w-5 accent-[#1F4E79]" />
+        <input {...register('ativo')} type="checkbox" className="h-5 w-5 accent-acao" />
         Jogador ativo
       </label>
       <div className="flex justify-end gap-3 sm:col-span-2">

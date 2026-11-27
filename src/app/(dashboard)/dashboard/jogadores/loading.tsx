@@ -1,5 +1,5 @@
-import { Carregando } from '@/components/ui/estados';
+import { Esqueleto } from '@/components/ui/estados';
 
 export default function CarregandoJogadores() {
-  return <Carregando rotulo="Preparando a ficha de jogadores…" />;
+  return <Esqueleto linhas={5} />;
 }

@@ -14,6 +14,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
 import { Carregando, Erro, Vazio } from '@/components/ui/estados';
 import { Modal, ModalConteudo, ModalGatilho } from '@/components/ui/modal';
+import { Confirmacao } from '@/components/ui/confirmacao';
 import { Tabela, TBody, TD, TH, THead, TR } from '@/components/ui/tabela';
 import { FormularioJogador } from '@/components/jogadores/FormularioJogador';
 import type { JogadorDTO, ListaDTO } from '@/types/dtos';
@@ -22,6 +23,7 @@ export function ListaJogadores() {
   const [busca, setBusca] = useState('');
   const [termo, setTermo] = useState('');
   const [modalAberta, setModalAberta] = useState(false);
+  const [jogadorParaRemover, setJogadorParaRemover] = useState<JogadorDTO | null>(null);
   const queryClient = useQueryClient();
   const chave = queryKeys.jogadores.lista({ q: termo });
   const { data, isPending, isError, error, refetch } = useApiQuery<ListaDTO<JogadorDTO>>(
@@ -30,7 +32,6 @@ export function ListaJogadores() {
   );
 
   async function excluir(jogador: JogadorDTO) {
-    if (!window.confirm(`Remover ${jogador.nome}?`)) return;
     try {
       await api.delete(`/jogadores/${jogador.id}`);
       toast.success('Jogador removido.');
@@ -52,7 +53,7 @@ export function ListaJogadores() {
             setTermo(busca.trim());
           }}
         >
-          <Search size={18} className="pointer-events-none absolute left-3 top-3 text-estrutura/60" aria-hidden="true" />
+          <Search size={18} className="pointer-events-none absolute left-3 top-3 text-estrutura/85" aria-hidden="true" />
           <Input
             value={busca}
             onChange={(evento) => setBusca(evento.target.value)}
@@ -99,7 +100,7 @@ export function ListaJogadores() {
                     <Link href={`/dashboard/jogadores/${jogador.id}`} className="inline-flex min-h-11 items-center font-medium hover:text-acao hover:underline">
                       {jogador.nome}
                     </Link>
-                    {jogador.clube && <p className="text-xs text-estrutura/65">{jogador.clube}</p>}
+                    {jogador.clube && <p className="text-xs text-estrutura/85">{jogador.clube}</p>}
                   </TD>
                   <TD>{jogador.categoria}</TD>
                   <TD className="text-right font-dados tabular-nums">{jogador.rating}</TD>
@@ -109,7 +110,7 @@ export function ListaJogadores() {
                     </Badge>
                   </TD>
                   <TD className="text-right">
-                    <Button type="button" variant="terciario" tamanho="curto" onClick={() => void excluir(jogador)}>
+                    <Button type="button" variant="terciario" tamanho="curto" onClick={() => setJogadorParaRemover(jogador)}>
                       Remover
                     </Button>
                   </TD>
@@ -119,6 +120,18 @@ export function ListaJogadores() {
           </Tabela>
         </Card>
       )}
+
+      <Confirmacao
+        aberto={jogadorParaRemover !== null}
+        onAlterar={(aberto) => { if (!aberto) setJogadorParaRemover(null); }}
+        titulo="Remover jogador?"
+        descricao={`${jogadorParaRemover?.nome ?? 'O jogador'} será removido da ficha do clube. Esta ação não pode ser desfeita.`}
+        rotuloConfirmar="Remover"
+        onConfirmar={() => {
+          if (jogadorParaRemover) void excluir(jogadorParaRemover);
+          setJogadorParaRemover(null);
+        }}
+      />
     </div>
   );
 }

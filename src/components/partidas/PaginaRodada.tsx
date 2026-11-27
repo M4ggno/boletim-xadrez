@@ -6,8 +6,9 @@ import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { useApiQuery } from '@/hooks/useApiQuery';
 import { queryKeys } from '@/services/queryKeys';
-import { Button } from '@/components/ui/button';
+import { BotaoEnviar } from '@/components/ui/botao-enviar';
 import { Badge } from '@/components/ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card } from '@/components/ui/card';
 import { Carregando, Erro, Vazio } from '@/components/ui/estados';
 import { Tabela, TBody, TD, TH, THead, TR } from '@/components/ui/tabela';
@@ -25,7 +26,7 @@ function LinhaResultado({
   nomes: Map<string, string>;
   onSalvo: () => void;
 }) {
-  const [estado, acao, pendente] = useActionState(registrarResultadoAction, estadoInicialAcao);
+  const [estado, acao] = useActionState(registrarResultadoAction, estadoInicialAcao);
 
   useEffect(() => {
     if (estado.mensagem) {
@@ -43,17 +44,20 @@ function LinhaResultado({
       <TD>
         <form action={acao} className="flex items-center justify-end gap-2">
           <input type="hidden" name="id" value={partida.id} />
-          <select
-            name="resultado"
-            defaultValue={partida.resultado}
-            aria-label={`Resultado entre ${nomes.get(partida.brancasId) ?? ''} e ${nomes.get(partida.pretasId) ?? ''}`}
-            className="h-10 rounded-md border bg-transparent px-2 text-sm"
-          >
-            {RESULTADOS_PARTIDA.map((resultado) => (
-              <option key={resultado} value={resultado}>{resultado}</option>
-            ))}
-          </select>
-          <Button type="submit" tamanho="curto" disabled={pendente}>Registrar</Button>
+          <Select name="resultado" defaultValue={partida.resultado}>
+            <SelectTrigger
+              className="w-28"
+              aria-label={`Resultado entre ${nomes.get(partida.brancasId) ?? ''} e ${nomes.get(partida.pretasId) ?? ''}`}
+            >
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {RESULTADOS_PARTIDA.map((resultado) => (
+                <SelectItem key={resultado} value={resultado}>{resultado}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <BotaoEnviar tamanho="curto">Registrar</BotaoEnviar>
         </form>
       </TD>
     </TR>
@@ -98,6 +102,12 @@ export function PaginaRodada({ torneioId, numero }: { torneioId: string; numero:
             <Badge tom={rodada.status === 'Encerrada' ? 'sucesso' : 'aviso'}>{rodada.status}</Badge>
           </div>
           {partidas.isPending && <Carregando />}
+          {partidas.isError && (
+            <Erro
+              mensagem="Não foi possível carregar as partidas desta rodada."
+              onTentarNovamente={() => void partidas.refetch()}
+            />
+          )}
           {partidas.data && partidas.data.itens.length === 0 && (
             <Vazio titulo="Sem partidas" descricao="Esta rodada ainda não tem partidas geradas." />
           )}

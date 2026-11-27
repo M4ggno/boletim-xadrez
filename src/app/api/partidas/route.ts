@@ -3,7 +3,7 @@ import { Types, type QueryFilter } from 'mongoose';
 import { dbConnect } from '@/lib/db';
 import { buscarDoUsuario, exigirSessao, responderErro } from '@/lib/guards';
 import { toPartidaDTO } from '@/lib/serializers';
-import { ErroValidacao, validarPayload } from '@/lib/validacao';
+import { ErroValidacao, escaparRegex, exigirId, validarPayload } from '@/lib/validacao';
 import Inscricao from '@/models/Inscricao';
 import Jogador from '@/models/Jogador';
 import Partida, { type IPartida } from '@/models/Partida';
@@ -17,12 +17,14 @@ async function lerFiltros(request: NextRequest): Promise<{
   torneioId: string;
   rodadaId: string;
   resultado: string;
+  q: string;
 }> {
   const url = new URL(request.url);
   return {
     torneioId: url.searchParams.get('torneioId') ?? '',
     rodadaId: url.searchParams.get('rodadaId') ?? '',
     resultado: url.searchParams.get('resultado') ?? '',
+    q: (url.searchParams.get('q') ?? '').trim(),
   };
 }
 
@@ -33,10 +35,23 @@ export async function GET(request: NextRequest) {
     await dbConnect();
 
     const consulta: QueryFilter<IPartida> = { usuarioId: new Types.ObjectId(usuarioId) };
-    if (filtros.torneioId) consulta.torneioId = new Types.ObjectId(filtros.torneioId);
-    if (filtros.rodadaId) consulta.rodadaId = new Types.ObjectId(filtros.rodadaId);
+    if (filtros.torneioId) consulta.torneioId = new Types.ObjectId(exigirId(filtros.torneioId));
+    if (filtros.rodadaId) consulta.rodadaId = new Types.ObjectId(exigirId(filtros.rodadaId));
     if (filtros.resultado && RESULTADOS_PARTIDA.some((opcao) => opcao === filtros.resultado)) {
       consulta.resultado = filtros.resultado as ResultadoPartida;
+    }
+    if (filtros.q) {
+      const jogadores = await Jogador.find({
+        usuarioId: new Types.ObjectId(usuarioId),
+        nome: { $regex: escaparRegex(filtros.q), $options: 'i' },
+      })
+        .select('_id')
+        .lean();
+      const ids = jogadores.map((jogador) => jogador._id);
+      if (ids.length === 0) {
+        return NextResponse.json({ itens: [], total: 0 });
+      }
+      consulta.$or = [{ brancasId: { $in: ids } }, { pretasId: { $in: ids } }];
     }
 
     const documentos = await Partida.find(consulta).sort({ createdAt: 1 }).lean();

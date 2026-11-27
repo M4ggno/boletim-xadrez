@@ -297,7 +297,7 @@ Ele lê `MONGODB_URI` do `.env.local` e testa a conexão com o Atlas sem imprimi
 Gates executados antes da entrega:
 
 - `npm run typecheck` — zero erros.
-- `npm run build` — zero erros, 23 rotas compiladas (inclui `/icon.svg`).
+- `npm run build` — zero erros, 24 entradas de rota (inclui `/_not-found` e `/icon.svg`).
 - `npm audit --omit=dev` — zero vulnerabilidades.
 - Validação de API e interface com banco real: autenticação bcrypt, 401/403, CRUD, regras de rodada e classificação calculada; telas privadas e isolamento entre organizadores verificados com sessão real.
 - Conexão com o Atlas confirmada por `scripts/verificar-conexao.mjs` sem exposição de segredos.
@@ -331,7 +331,7 @@ A conexão com o Mongoose usa singleton com cache global, adequado ao modelo ser
 | --- | --- | --- |
 | `MongoServerError: authentication failed` | Usuário/senha ou URI errados no Atlas | Confira `MONGODB_URI`, o usuário em Database Access e o IP em Network Access. |
 | Login redireciona para `/login?error=...` | `NEXTAUTH_SECRET` ausente ou `NEXTAUTH_URL` incorreto | Defina a chave e confira a URL base. |
-| Página privada volta para `/login` | Sessão expirada | Entre novamente; o JWT é válido por 30 dias. |
+| Página privada volta para `/login` | Sessão expirada | Entre novamente; o JWT é válido por 7 dias. |
 | `Não foi possível gerar a rodada` | Número ímpar de inscritos ou torneio não iniciado | Inscreva um número par e inicie o torneio. |
 | `Ainda há partidas sem resultado` | Rodada com partida `Pendente` | Lance todos os resultados antes de encerrar. |
 | Build falha apenas na Vercel | Variáveis faltando no ambiente de produção | Adicione `MONGODB_URI` e `NEXTAUTH_SECRET` em Environment Variables e faça novo deploy. |
@@ -341,4 +341,4 @@ A conexão com o Mongoose usa singleton com cache global, adequado ao modelo ser
 
 ## Estado da entrega
 
-Planejamento em `PLANO_DE_CRIACAO.md`. Quatro ondas concluídas: base e autenticação, API e regras de negócio, interface, documentação e auditoria. Identidade visual original em SVG e interface polida com os primitivos ShadCN/UI. O projeto usa somente MongoDB Atlas — não há Docker. Nenhum segredo foi commitado. O deploy depende apenas das variáveis de ambiente do seu próprio Atlas e da sua conta Vercel.
+Base e autenticação, API e regras de negócio, interface, documentação e auditoria concluídos. Identidade visual original em SVG, primitivos Radix/CVA no padrão ShadCN/UI (configuração em `components.json`), inclusive `Select`, e tabela com aliases canônicos. O projeto usa somente MongoDB Atlas — não há Docker. Nenhum segredo foi commitado. O deploy depende apenas das variáveis de ambiente do seu próprio Atlas e da sua conta Vercel.

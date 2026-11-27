@@ -4,21 +4,26 @@ import { useActionState, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
+import { Search } from 'lucide-react';
 import { useApiQuery } from '@/hooks/useApiQuery';
 import { queryKeys } from '@/services/queryKeys';
 import { api } from '@/services/api';
 import { Button } from '@/components/ui/button';
+import { BotaoEnviar } from '@/components/ui/botao-enviar';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Carregando, Erro, Vazio } from '@/components/ui/estados';
 import { Tabela, TBody, TD, TH, THead, TR } from '@/components/ui/tabela';
+import { Confirmacao } from '@/components/ui/confirmacao';
 import { registrarResultadoAction } from '@/app/actions/partida-actions';
 import { estadoInicialAcao } from '@/types/acoes';
 import { RESULTADOS_PARTIDA } from '@/types/dominio';
 import type { JogadorDTO, ListaDTO, PartidaDTO, TorneioDTO, RodadaDTO } from '@/types/dtos';
 
 function FormularioResultado({ partida, onSalvo }: { partida: PartidaDTO; onSalvo: () => void }) {
-  const [estado, acao, pendente] = useActionState(registrarResultadoAction, estadoInicialAcao);
+  const [estado, acao] = useActionState(registrarResultadoAction, estadoInicialAcao);
 
   useEffect(() => {
     if (estado.mensagem) {
@@ -31,17 +36,17 @@ function FormularioResultado({ partida, onSalvo }: { partida: PartidaDTO; onSalv
   return (
     <form action={acao} className="flex items-center justify-end gap-2">
       <input type="hidden" name="id" value={partida.id} />
-      <select
-        name="resultado"
-        defaultValue={partida.resultado}
-        aria-label={`Resultado da partida ${partida.id}`}
-        className="h-10 rounded-md border bg-transparent px-2 text-sm"
-      >
-        {RESULTADOS_PARTIDA.map((resultado) => (
-          <option key={resultado} value={resultado}>{resultado}</option>
-        ))}
-      </select>
-      <Button type="submit" tamanho="curto" disabled={pendente}>{pendente ? '…' : 'Salvar'}</Button>
+      <Select name="resultado" defaultValue={partida.resultado}>
+        <SelectTrigger className="w-32" aria-label={`Resultado da partida ${partida.id}`}>
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          {RESULTADOS_PARTIDA.map((resultado) => (
+            <SelectItem key={resultado} value={resultado}>{resultado}</SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+      <BotaoEnviar tamanho="curto" pendente="…">Salvar</BotaoEnviar>
     </form>
   );
 }
@@ -49,9 +54,13 @@ function FormularioResultado({ partida, onSalvo }: { partida: PartidaDTO; onSalv
 export function ListaPartidas() {
   const queryClient = useQueryClient();
   const [filtroTorneio, setFiltroTorneio] = useState('');
-  const sufixo = filtroTorneio ? `?torneioId=${filtroTorneio}` : '';
+  const [busca, setBusca] = useState('');
+  const [termo, setTermo] = useState('');
+  const [partidaParaRemover, setPartidaParaRemover] = useState<PartidaDTO | null>(null);
+  const filtros = { torneioId: filtroTorneio, q: termo };
+  const sufixo = `?torneioId=${filtroTorneio}&q=${encodeURIComponent(termo)}`;
   const partidas = useApiQuery<ListaDTO<PartidaDTO>>(
-    queryKeys.partidas.lista({ torneioId: filtroTorneio }),
+    queryKeys.partidas.lista(filtros),
     `/partidas${sufixo}`,
   );
   const torneios = useApiQuery<ListaDTO<TorneioDTO>>(queryKeys.torneios.todos, '/torneios');
@@ -62,7 +71,6 @@ export function ListaPartidas() {
   const numerosRodada = new Map((rodadas.data?.itens ?? []).map((rodada) => [rodada.id, rodada.numero]));
 
   async function excluir(partida: PartidaDTO) {
-    if (!window.confirm('Remover esta partida?')) return;
     try {
       await api.delete(`/partidas/${partida.id}`);
       toast.success('Partida removida.');
@@ -75,18 +83,37 @@ export function ListaPartidas() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <select
-          value={filtroTorneio}
-          onChange={(evento) => setFiltroTorneio(evento.target.value)}
-          aria-label="Filtrar por torneio"
-          className="h-11 w-full rounded-md border bg-transparent px-3 text-base sm:max-w-sm"
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+        <form
+          className="relative w-full sm:max-w-sm"
+          onSubmit={(evento) => {
+            evento.preventDefault();
+            setTermo(busca.trim());
+          }}
         >
-          <option value="">Todos os torneios</option>
-          {(torneios.data?.itens ?? []).map((torneio) => (
-            <option key={torneio.id} value={torneio.id}>{torneio.nome}</option>
-          ))}
-        </select>
+          <Search size={18} className="pointer-events-none absolute left-3 top-3 text-estrutura/85" aria-hidden="true" />
+          <Input
+            value={busca}
+            onChange={(evento) => setBusca(evento.target.value)}
+            placeholder="Buscar por jogador"
+            aria-label="Buscar partidas por jogador"
+            className="pl-10"
+          />
+        </form>
+        <div className="w-full sm:w-64">
+          <Select
+            value={filtroTorneio || 'todos'}
+            onValueChange={(valor) => setFiltroTorneio(valor === 'todos' ? '' : valor)}
+          >
+            <SelectTrigger aria-label="Filtrar por torneio"><SelectValue /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="todos">Todos os torneios</SelectItem>
+              {(torneios.data?.itens ?? []).map((torneio) => (
+                <SelectItem key={torneio.id} value={torneio.id}>{torneio.nome}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
       {partidas.isPending && <Carregando rotulo="Carregando partidas…" />}
@@ -94,7 +121,22 @@ export function ListaPartidas() {
         <Erro mensagem={partidas.error instanceof Error ? partidas.error.message : 'Tente novamente.'} onTentarNovamente={() => void partidas.refetch()} />
       )}
       {partidas.data && partidas.data.itens.length === 0 && (
-        <Vazio titulo="Nenhuma partida" descricao="Gere uma rodada em um torneio em andamento para ver as partidas." />
+        <Vazio
+          titulo={filtroTorneio || termo ? 'Nenhuma partida encontrada' : 'Nenhuma partida'}
+          descricao={filtroTorneio || termo
+            ? 'Ajuste o torneio ou o nome do jogador para ver outras partidas.'
+            : 'Gere uma rodada em um torneio em andamento para ver as partidas.'}
+          acao={filtroTorneio || termo
+            ? {
+                rotulo: 'Limpar filtros',
+                onClick: () => {
+                  setFiltroTorneio('');
+                  setBusca('');
+                  setTermo('');
+                },
+              }
+            : undefined}
+        />
       )}
       {partidas.data && partidas.data.itens.length > 0 && (
         <Card>
@@ -130,7 +172,7 @@ export function ListaPartidas() {
                         void queryClient.invalidateQueries({ queryKey: queryKeys.classificacao(partida.torneioId) });
                       }}
                     />
-                    <Button type="button" variant="terciario" tamanho="curto" onClick={() => void excluir(partida)}>
+                    <Button type="button" variant="terciario" tamanho="curto" onClick={() => setPartidaParaRemover(partida)}>
                       Remover
                     </Button>
                   </TD>
@@ -140,6 +182,18 @@ export function ListaPartidas() {
           </Tabela>
         </Card>
       )}
+
+      <Confirmacao
+        aberto={partidaParaRemover !== null}
+        onAlterar={(aberto) => { if (!aberto) setPartidaParaRemover(null); }}
+        titulo="Remover partida?"
+        descricao="A partida será excluída e a classificação recalculada. Esta ação não pode ser desfeita."
+        rotuloConfirmar="Remover"
+        onConfirmar={() => {
+          if (partidaParaRemover) void excluir(partidaParaRemover);
+          setPartidaParaRemover(null);
+        }}
+      />
     </div>
   );
 }

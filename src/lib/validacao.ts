@@ -27,3 +27,8 @@ export function exigirId(valor: unknown): string {
   }
   return id;
 }
+
+/** Escapa metacaracteres antes de usar a busca do usuário em $regex. */
+export function escaparRegex(valor: string): string {
+  return valor.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}

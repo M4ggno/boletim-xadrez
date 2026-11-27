@@ -3,7 +3,7 @@ import { Types, type QueryFilter } from 'mongoose';
 import { dbConnect } from '@/lib/db';
 import { exigirSessao, responderErro } from '@/lib/guards';
 import { toJogadorDTO } from '@/lib/serializers';
-import { validarPayload } from '@/lib/validacao';
+import { escaparRegex, validarPayload } from '@/lib/validacao';
 import Jogador, { type IJogador } from '@/models/Jogador';
 import { jogadorSchema } from '@/schemas/jogador';
 import { CATEGORIAS_JOGADOR, type CategoriaJogador } from '@/types/dominio';
@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
     await dbConnect();
 
     const consulta: QueryFilter<IJogador> = { usuarioId: new Types.ObjectId(usuarioId) };
-    if (filtros.q) consulta.nome = { $regex: filtros.q, $options: 'i' };
+    if (filtros.q) consulta.nome = { $regex: escaparRegex(filtros.q), $options: 'i' };
     if (filtros.categoria && CATEGORIAS_JOGADOR.some((opcao) => opcao === filtros.categoria)) {
       consulta.categoria = filtros.categoria as CategoriaJogador;
     }

@@ -2,14 +2,14 @@
 
 import { useActionState, useEffect, useRef, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { toast } from 'sonner';
 import { useInvalidarAposAcao } from '@/hooks/useInvalidarAposAcao';
 import { queryKeys } from '@/services/queryKeys';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Select } from '@/components/ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Campo } from '@/components/formularios/Campo';
 import { criarTorneioAction } from '@/app/actions/torneio-actions';
 import { estadoInicialAcao } from '@/types/acoes';
@@ -25,6 +25,7 @@ export function FormularioTorneio({ onSucesso }: { onSucesso?: () => void }) {
   useInvalidarAposAcao([estado], [queryKeys.torneios.todos]);
   const {
     register,
+    control,
     handleSubmit,
     formState: { errors },
   } = useForm<TorneioForm>({
@@ -77,11 +78,22 @@ export function FormularioTorneio({ onSucesso }: { onSucesso?: () => void }) {
         <Input {...register('numeroRodadas', { valueAsNumber: true })} type="number" min={1} max={20} required />
       </Campo>
       <Campo rotulo="Formato" erro={errors.formato?.message}>
-        <Select {...register('formato')}>
-          {FORMATOS_TORNEIO.map((formato) => (
-            <option key={formato} value={formato}>{formato}</option>
-          ))}
-        </Select>
+        <Controller
+          control={control}
+          name="formato"
+          render={({ field }) => (
+            <Select value={field.value} onValueChange={field.onChange} name={field.name}>
+              <SelectTrigger aria-invalid={Boolean(errors.formato)}>
+                <SelectValue placeholder="Selecione o formato" />
+              </SelectTrigger>
+              <SelectContent>
+                {FORMATOS_TORNEIO.map((formato) => (
+                  <SelectItem key={formato} value={formato}>{formato}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
+        />
       </Campo>
       <input type="hidden" {...register('status')} />
       <div className="flex items-end justify-end gap-3 sm:col-span-2">

@@ -1,5 +1,5 @@
-import { Carregando } from '@/components/ui/estados';
+import { Esqueleto } from '@/components/ui/estados';
 
 export default function CarregandoDashboard() {
-  return <Carregando rotulo="Preparando o painel…" />;
+  return <Esqueleto linhas={3} />;
 }

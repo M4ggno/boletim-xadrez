@@ -33,7 +33,7 @@ export function ModalConteudo({
           <div>
             <DialogPrimitive.Title className="font-titulo text-xl font-semibold">{titulo}</DialogPrimitive.Title>
             {descricao && (
-              <DialogPrimitive.Description className="mt-1 text-sm text-estrutura/75">
+              <DialogPrimitive.Description className="mt-1 text-sm text-estrutura/85">
                 {descricao}
               </DialogPrimitive.Description>
             )}

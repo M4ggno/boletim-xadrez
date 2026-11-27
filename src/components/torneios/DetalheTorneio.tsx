@@ -8,12 +8,14 @@ import { useInvalidarAposAcao } from '@/hooks/useInvalidarAposAcao';
 import { queryKeys } from '@/services/queryKeys';
 import { api } from '@/services/api';
 import { Button } from '@/components/ui/button';
+import { BotaoEnviar } from '@/components/ui/botao-enviar';
+import { Confirmacao } from '@/components/ui/confirmacao';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Carregando, Erro, Vazio } from '@/components/ui/estados';
 import { AbaConteudo, AbaGatilho, Abas, AbasLista } from '@/components/ui/abas';
 import { Tabela, TBody, TD, TH, THead, TR } from '@/components/ui/tabela';
-import { Select } from '@/components/ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { FormularioTorneio } from '@/components/torneios/FormularioTorneio';
 import {
   atualizarTorneioAction,
@@ -24,6 +26,7 @@ import {
   inscreverJogadorAction,
 } from '@/app/actions/torneio-actions';
 import { estadoInicialAcao } from '@/types/acoes';
+import { FORMATOS_TORNEIO, STATUS_TORNEIO } from '@/types/dominio';
 import type {
   ClassificacaoDTO,
   InscricaoDTO,
@@ -44,7 +47,9 @@ function MensagemAcao({ estado }: { estado: { mensagem?: string; erro?: string }
 export function DetalheTorneio({ id }: { id: string }) {
   const [editando, setEditando] = useState(false);
   const [jogadorId, setJogadorId] = useState('');
-  const [estadoInscricao, acaoInscricao, inscrevendo] = useActionState(inscreverJogadorAction, estadoInicialAcao);
+  const [confirmarEncerrar, setConfirmarEncerrar] = useState(false);
+  const [inscricaoParaCancelar, setInscricaoParaCancelar] = useState<InscricaoDTO | null>(null);
+  const [estadoInscricao, acaoInscricao] = useActionState(inscreverJogadorAction, estadoInicialAcao);
   const [estadoCancelar, acaoCancelar] = useActionState(cancelarInscricaoAction, estadoInicialAcao);
   const [estadoIniciar, acaoIniciar] = useActionState(iniciarTorneioAction, estadoInicialAcao);
   const [estadoEncerrar, acaoEncerrar] = useActionState(encerrarTorneioAction, estadoInicialAcao);
@@ -123,7 +128,7 @@ export function DetalheTorneio({ id }: { id: string }) {
         <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-3">
           <div>
             <CardTitle className="text-2xl">{dados.nome}</CardTitle>
-            <p className="mt-1 text-sm text-estrutura/75">
+            <p className="mt-1 text-sm text-estrutura/85">
               {dados.local} · {new Date(dados.dataInicio).toLocaleDateString('pt-BR')} · {dados.formato} · {dados.numeroRodadas} rodadas
             </p>
           </div>
@@ -142,7 +147,7 @@ export function DetalheTorneio({ id }: { id: string }) {
               <Button type="button" onClick={() => startTransition(() => { acaoRodada(formularioSimples({ torneioId: id })); })}>
                 Gerar próxima rodada
               </Button>
-              <Button type="button" variant="secundario" onClick={() => startTransition(() => { acaoEncerrar(formularioSimples({ id })); })}>
+              <Button type="button" variant="secundario" onClick={() => setConfirmarEncerrar(true)}>
                 Encerrar torneio
               </Button>
             </>
@@ -163,9 +168,23 @@ export function DetalheTorneio({ id }: { id: string }) {
               <label className="text-sm">Local<input name="local" defaultValue={dados.local} className="mt-1 h-11 w-full rounded-md border bg-transparent px-3 text-base" required /></label>
               <label className="text-sm">Data<input name="dataInicio" type="date" defaultValue={dados.dataInicio.slice(0, 10)} className="mt-1 h-11 w-full rounded-md border bg-transparent px-3 text-base" required /></label>
               <label className="text-sm">Rodadas<input name="numeroRodadas" type="number" min={1} max={20} defaultValue={dados.numeroRodadas} className="mt-1 h-11 w-full rounded-md border bg-transparent px-3 text-base" required /></label>
-              <label className="text-sm">Formato<Select name="formato" defaultValue={dados.formato}><option>Suíço</option><option>Eliminatória</option></Select></label>
-              <label className="text-sm">Status<Select name="status" defaultValue={dados.status}><option>Inscrições abertas</option><option>Em andamento</option><option>Encerrado</option></Select></label>
-              <div className="sm:col-span-2"><Button type="submit">Salvar alterações</Button></div>
+              <label className="text-sm">Formato
+                <Select name="formato" defaultValue={dados.formato}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {FORMATOS_TORNEIO.map((formato) => <SelectItem key={formato} value={formato}>{formato}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </label>
+              <label className="text-sm">Status
+                <Select name="status" defaultValue={dados.status}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {STATUS_TORNEIO.map((status) => <SelectItem key={status} value={status}>{status}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </label>
+              <div className="sm:col-span-2"><BotaoEnviar>Salvar alterações</BotaoEnviar></div>
             </form>
           </CardContent>
         </Card>
@@ -186,17 +205,25 @@ export function DetalheTorneio({ id }: { id: string }) {
             >
               <input type="hidden" name="torneioId" value={id} />
               <div className="w-full sm:max-w-sm">
-                <Select value={jogadorId} onChange={(evento) => setJogadorId(evento.target.value)} name="jogadorId" required>
-                  <option value="">Selecione um jogador</option>
-                  {todosJogadores.map((jogador) => (
-                    <option key={jogador.id} value={jogador.id}>{jogador.nome} · {jogador.rating}</option>
-                  ))}
+                <Select value={jogadorId} onValueChange={setJogadorId} name="jogadorId" required>
+                  <SelectTrigger><SelectValue placeholder="Selecione um jogador" /></SelectTrigger>
+                  <SelectContent>
+                    {todosJogadores.map((jogador) => (
+                      <SelectItem key={jogador.id} value={jogador.id}>{jogador.nome} · {jogador.rating}</SelectItem>
+                    ))}
+                  </SelectContent>
                 </Select>
               </div>
-              <Button type="submit" disabled={inscrevendo || !jogadorId}>Inscrever jogador</Button>
+              <BotaoEnviar disabled={!jogadorId} pendente="Inscrevendo…">Inscrever jogador</BotaoEnviar>
             </form>
           )}
           {inscricoes.isPending && <Carregando />}
+          {inscricoes.isError && (
+            <Erro
+              mensagem="Não foi possível carregar as inscrições."
+              onTentarNovamente={() => void inscricoes.refetch()}
+            />
+          )}
           {inscricoes.data && inscricoes.data.itens.length === 0 && (
             <Vazio titulo="Sem inscrições" descricao="Inscreva ao menos dois jogadores para iniciar o torneio." />
           )}
@@ -211,7 +238,7 @@ export function DetalheTorneio({ id }: { id: string }) {
                       <TD className="font-dados tabular-nums">{new Date(inscricao.dataInscricao).toLocaleDateString('pt-BR')}</TD>
                       <TD className="text-right">
                         {dados.status === 'Inscrições abertas' && (
-                          <Button type="button" variant="terciario" tamanho="curto" onClick={() => startTransition(() => { acaoCancelar(formularioSimples({ id: inscricao.id })); })}>
+                          <Button type="button" variant="terciario" tamanho="curto" onClick={() => setInscricaoParaCancelar(inscricao)}>
                             Cancelar
                           </Button>
                         )}
@@ -226,6 +253,12 @@ export function DetalheTorneio({ id }: { id: string }) {
 
         <AbaConteudo value="rodadas" className="pt-6">
           {rodadas.isPending && <Carregando />}
+          {rodadas.isError && (
+            <Erro
+              mensagem="Não foi possível carregar as rodadas."
+              onTentarNovamente={() => void rodadas.refetch()}
+            />
+          )}
           {rodadas.data && rodadas.data.itens.length === 0 && (
             <Vazio titulo="Sem rodadas" descricao="Inicie o torneio e gere a primeira rodada." />
           )}
@@ -237,7 +270,7 @@ export function DetalheTorneio({ id }: { id: string }) {
                     <span className="font-titulo text-lg font-semibold">Rodada {rodada.numero}</span>
                     <Badge tom={rodada.status === 'Encerrada' ? 'sucesso' : 'aviso'}>{rodada.status}</Badge>
                   </div>
-                  <p className="mt-2 text-sm text-estrutura/70">Ver partidas e lançar resultados →</p>
+                  <p className="mt-2 text-sm text-estrutura/85">Ver partidas e lançar resultados →</p>
                 </Link>
               ))}
             </div>
@@ -246,6 +279,12 @@ export function DetalheTorneio({ id }: { id: string }) {
 
         <AbaConteudo value="classificacao" className="pt-6">
           {classificacao.isPending && <Carregando />}
+          {classificacao.isError && (
+            <Erro
+              mensagem="Não foi possível calcular a classificação."
+              onTentarNovamente={() => void classificacao.refetch()}
+            />
+          )}
           {classificacao.data && classificacao.data.length === 0 && (
             <Vazio titulo="Classificação vazia" descricao="Inscreva jogadores para compor a tabela." />
           )}
@@ -277,6 +316,31 @@ export function DetalheTorneio({ id }: { id: string }) {
           )}
         </AbaConteudo>
       </Abas>
+
+      <Confirmacao
+        aberto={confirmarEncerrar}
+        onAlterar={setConfirmarEncerrar}
+        titulo="Encerrar torneio?"
+        descricao="O torneio será marcado como encerrado e novas rodadas deixam de ser geradas."
+        rotuloConfirmar="Encerrar"
+        onConfirmar={() => {
+          startTransition(() => { acaoEncerrar(formularioSimples({ id })); });
+          setConfirmarEncerrar(false);
+        }}
+      />
+      <Confirmacao
+        aberto={inscricaoParaCancelar !== null}
+        onAlterar={(aberto) => { if (!aberto) setInscricaoParaCancelar(null); }}
+        titulo="Cancelar inscrição?"
+        descricao={`${inscricaoParaCancelar?.jogadorNome ?? 'O jogador'} será removido deste torneio.`}
+        rotuloConfirmar="Cancelar inscrição"
+        onConfirmar={() => {
+          if (inscricaoParaCancelar) {
+            startTransition(() => { acaoCancelar(formularioSimples({ id: inscricaoParaCancelar.id })); });
+          }
+          setInscricaoParaCancelar(null);
+        }}
+      />
     </div>
   );
 }

@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { PaginaRodada } from '@/components/partidas/PaginaRodada';
 import { TituloPagina } from '@/components/layout/TituloPagina';
+import { exigirSessao } from '@/lib/guards';
 import { exigirPaginaPrivada } from '@/lib/guards-pagina';
 import Rodada from '@/models/Rodada';
 import Torneio from '@/models/Torneio';
@@ -23,10 +24,12 @@ export default async function PaginaDetalheRodada({
   }
 
   await exigirPaginaPrivada(Torneio, id);
+  const usuarioId = await exigirSessao();
   await dbConnect();
   const rodada = await Rodada.findOne({
     torneioId: new Types.ObjectId(id),
     numero: numeroRodada,
+    usuarioId: new Types.ObjectId(usuarioId),
   }).select('_id');
 
   if (!rodada) notFound();

@@ -8,12 +8,13 @@ import { useApiQuery } from '@/hooks/useApiQuery';
 import { useInvalidarAposAcao } from '@/hooks/useInvalidarAposAcao';
 import { queryKeys } from '@/services/queryKeys';
 import { Button } from '@/components/ui/button';
+import { BotaoEnviar } from '@/components/ui/botao-enviar';
 import { Input } from '@/components/ui/input';
-import { Select } from '@/components/ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Campo } from '@/components/formularios/Campo';
-import { ConfirmaoExclusao } from '@/components/jogadores/ConfirmacaoExclusao';
+import { ConfirmacaoExclusao } from '@/components/jogadores/ConfirmacaoExclusao';
 import { Carregando, Erro } from '@/components/ui/estados';
 import { atualizarJogadorAction, excluirJogadorAction } from '@/app/actions/jogador-actions';
 import { estadoInicialAcao } from '@/types/acoes';
@@ -26,7 +27,7 @@ export function DetalheJogador({ id }: { id: string }) {
     queryKeys.jogadores.detalhe(id),
     `/jogadores/${id}`,
   );
-  const [estado, acao, pendente] = useActionState(atualizarJogadorAction, estadoInicialAcao);
+  const [estado, acao] = useActionState(atualizarJogadorAction, estadoInicialAcao);
   const [estadoExclusao, acaoExclusao, excluindo] = useActionState(excluirJogadorAction, estadoInicialAcao);
   const [, startTransition] = useTransition();
   const [confirmar, setConfirmar] = useState(false);
@@ -87,9 +88,12 @@ export function DetalheJogador({ id }: { id: string }) {
               </Campo>
               <Campo rotulo="Categoria">
                 <Select name="categoria" defaultValue={data.categoria}>
-                  {CATEGORIAS_JOGADOR.map((categoria) => (
-                    <option key={categoria} value={categoria}>{categoria}</option>
-                  ))}
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {CATEGORIAS_JOGADOR.map((categoria) => (
+                      <SelectItem key={categoria} value={categoria}>{categoria}</SelectItem>
+                    ))}
+                  </SelectContent>
                 </Select>
               </Campo>
               <Campo rotulo="Clube">
@@ -101,12 +105,12 @@ export function DetalheJogador({ id }: { id: string }) {
                   name="ativo"
                   value="true"
                   defaultChecked={data.ativo}
-                  className="h-5 w-5 accent-[#1F4E79]"
+                  className="h-5 w-5 accent-acao"
                 />
                 Jogador ativo
               </label>
               <div className="sm:col-span-2">
-                <Button type="submit" disabled={pendente}>{pendente ? 'Salvando…' : 'Salvar alterações'}</Button>
+                <BotaoEnviar>Salvar alterações</BotaoEnviar>
               </div>
             </form>
           </CardContent>
@@ -116,11 +120,11 @@ export function DetalheJogador({ id }: { id: string }) {
           <CardHeader><CardTitle>Resumo</CardTitle></CardHeader>
           <CardContent className="space-y-3 text-sm">
             <div className="flex items-center justify-between gap-3">
-              <span className="text-estrutura/70">Situação</span>
+              <span className="text-estrutura/85">Situação</span>
               <Badge tom={data.ativo ? 'sucesso' : 'neutro'}>{data.ativo ? 'Ativo' : 'Inativo'}</Badge>
             </div>
             <div className="flex items-center justify-between gap-3">
-              <span className="text-estrutura/70">Rating</span>
+              <span className="text-estrutura/85">Rating</span>
               <span className="font-dados tabular-nums">{data.rating}</span>
             </div>
             <div className="border-t pt-4">
@@ -132,7 +136,7 @@ export function DetalheJogador({ id }: { id: string }) {
         </Card>
       </div>
 
-      <ConfirmaoExclusao
+      <ConfirmacaoExclusao
         aberto={confirmar}
         onAlterar={setConfirmar}
         titulo="Remover jogador?"

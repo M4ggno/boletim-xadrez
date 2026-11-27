@@ -2,7 +2,7 @@
 
 import { Confirmacao } from '@/components/ui/confirmacao';
 
-export function ConfirmaoExclusao({
+export function ConfirmacaoExclusao({
   aberto,
   onAlterar,
   titulo,

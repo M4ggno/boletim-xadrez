@@ -38,7 +38,7 @@ export function Resumo() {
           <Card className="h-full transition-colors hover:border-acao">
             <CardContent className="flex items-center justify-between gap-4">
               <div>
-                <p className="text-sm text-estrutura/75">{rotulo}</p>
+                <p className="text-sm text-estrutura/85">{rotulo}</p>
                 <p className="mt-1 font-dados text-3xl font-semibold tabular-nums">{valor}</p>
               </div>
               <Icone size={28} strokeWidth={1.5} className="text-acao" aria-hidden="true" />
